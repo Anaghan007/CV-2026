@@ -49,44 +49,59 @@
         }
         .bento-card:hover { border-color: #3f3f46; }
 
-        /* --- PRINT OPTIMIZATION (FIXED) --- */
+        /* --- FORCE ONE PAGE PRINT --- */
         @media print {
             @page { 
                 size: A4; 
-                margin: 5mm; /* Small margin to prevent printer clipping */
+                margin: 0mm !important; /* Force zero margins */
             }
             
-            body { 
-                margin: 0; 
-                padding: 0; 
+            html, body {
+                width: 210mm;
+                height: 297mm;
+                margin: 0 !important;
+                padding: 0 !important;
                 background-color: #09090b !important;
+                overflow: hidden !important; /* Hide anything that spills over */
+            }
+
+            #root {
+                display: flex;
+                justify-content: center;
+                align-items: start;
+                width: 100%;
+                height: 100%;
             }
 
             .cv-wrapper {
                 width: 100% !important;
-                max-width: none !important;
-                /* Crucial: Scales down content slightly to ensure it fits height */
-                transform: scale(0.95); 
-                transform-origin: top center;
+                max-width: 100% !important;
+                height: 100vh !important;
+                /* THIS ZOOM FIXES THE CUT OFF */
+                zoom: 85%; 
+                padding: 10mm !important;
+                box-sizing: border-box;
             }
 
             .print-hidden { display: none !important; }
             
-            .bento-card {
-                /* Prevents cards from splitting across pages */
-                page-break-inside: avoid !important; 
-                border: 1px solid #333 !important; /* Ensure borders print */
+            /* Tighter gaps for print */
+            .print-grid { 
+                display: grid !important; 
+                grid-template-columns: repeat(12, minmax(0, 1fr)) !important; 
+                gap: 0.5rem !important; /* Reduced gap */
             }
-            
-            /* FORCE GRID LAYOUT */
-            .print-grid { display: grid !important; grid-template-columns: repeat(12, minmax(0, 1fr)) !important; gap: 0.5rem !important; }
+
             .print-col-12 { grid-column: span 12 / span 12 !important; }
             .print-col-4 { grid-column: span 4 / span 4 !important; }
             .print-col-8 { grid-column: span 8 / span 8 !important; }
             .print-flex-row { flex-direction: row !important; }
             
-            /* Compact padding for print to save vertical space */
-            .print-compact-p { padding: 1rem !important; } 
+            /* Tighter padding inside cards for print */
+            .print-p-tight { padding: 1.25rem !important; } 
+            
+            /* Hide scrollbars */
+            ::-webkit-scrollbar { display: none; }
         }
     </style>
 </head>
@@ -194,7 +209,7 @@
                     <div className="cv-wrapper w-full md:max-w-[210mm] flex flex-col md:grid md:grid-cols-12 gap-3 print-grid">
                         
                         {/* 1. HEADER */}
-                        <div className="col-span-12 print-col-12 bento-card p-6 print-compact-p flex flex-col md:flex-row items-center gap-8 relative overflow-hidden print-flex-row">
+                        <div className="col-span-12 print-col-12 bento-card p-6 print-p-tight flex flex-col md:flex-row items-center gap-8 relative overflow-hidden print-flex-row">
                             <div className="absolute top-0 right-0 w-64 h-64 bg-accent/10 blur-[80px] rounded-full pointer-events-none"></div>
                             
                             <div className="w-40 h-40 relative shrink-0">
@@ -228,7 +243,7 @@
 
                         {/* 2. LEFT COLUMN */}
                         <div className="col-span-12 md:col-span-4 print-col-4 flex flex-col gap-3">
-                            <div className="bento-card p-5 print-compact-p">
+                            <div className="bento-card p-5 print-p-tight">
                                 <div className="flex items-center gap-2 mb-3">
                                     <i className="fas fa-user-astronaut text-accent"></i>
                                     <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">About Me</span>
@@ -238,7 +253,7 @@
                                 </p>
                             </div>
 
-                            <div className="bento-card p-5 print-compact-p flex-grow">
+                            <div className="bento-card p-5 print-p-tight flex-grow">
                                 <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">Core Skills</h3>
                                 <div className="flex flex-wrap gap-2 mb-6">
                                     {cvData.skills.map((skill, i) => (
@@ -261,7 +276,7 @@
 
                         {/* 3. RIGHT COLUMN */}
                         <div className="col-span-12 md:col-span-8 print-col-8 flex flex-col gap-3">
-                            <div className="bento-card p-6 print-compact-p">
+                            <div className="bento-card p-6 print-p-tight">
                                 <h2 className="text-lg font-roleFont font-bold text-white mb-6 flex items-center gap-2">
                                     <span className="w-8 h-8 rounded bg-accent/10 flex items-center justify-center text-accent text-sm">
                                         <i className="fas fa-briefcase"></i>
@@ -286,7 +301,7 @@
                                 </div>
                             </div>
 
-                            <div className="bento-card p-6 print-compact-p">
+                            <div className="bento-card p-6 print-p-tight flex-grow">
                                 <h2 className="text-lg font-roleFont font-bold text-white mb-4 flex items-center gap-2">
                                     <i className="fas fa-graduation-cap text-accent"></i> Education
                                 </h2>
