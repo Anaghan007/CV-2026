@@ -49,56 +49,44 @@
         }
         .bento-card:hover { border-color: #3f3f46; }
 
-        /* --- PRINT OPTIMIZATION --- */
+        /* --- PRINT OPTIMIZATION (FIXED) --- */
         @media print {
-            @page { size: A4; margin: 0mm; } /* Remove browser margins */
+            @page { 
+                size: A4; 
+                margin: 5mm; /* Small margin to prevent printer clipping */
+            }
             
-            body, html { 
-                height: 100%; 
-                margin: 0 !important; 
-                padding: 0 !important; 
-                overflow: hidden; /* Prevent 2nd page */
+            body { 
+                margin: 0; 
+                padding: 0; 
+                background-color: #09090b !important;
             }
 
-            #root {
-                height: 297mm; /* Exact A4 Height */
-                width: 210mm;  /* Exact A4 Width */
-                display: flex;
-            }
-
-            .cv-wrapper { 
-                height: 100% !important; 
-                width: 100% !important; 
-                padding: 8mm !important; /* Internal padding for safety */
-                display: grid !important;
-                grid-template-rows: auto 1fr; /* Header auto, rest fills space */
+            .cv-wrapper {
+                width: 100% !important;
+                max-width: none !important;
+                /* Crucial: Scales down content slightly to ensure it fits height */
+                transform: scale(0.95); 
+                transform-origin: top center;
             }
 
             .print-hidden { display: none !important; }
             
-            /* Columns stretch to fill height */
-            .print-col-4, .print-col-8 {
-                display: flex !important;
-                flex-direction: column !important;
-                height: 100% !important;
-            }
-
-            /* The last card in columns grows to fill space */
-            .fill-space {
-                flex-grow: 1 !important;
+            .bento-card {
+                /* Prevents cards from splitting across pages */
+                page-break-inside: avoid !important; 
+                border: 1px solid #333 !important; /* Ensure borders print */
             }
             
-            .print-grid { 
-                display: grid !important; 
-                grid-template-columns: repeat(12, minmax(0, 1fr)) !important; 
-                gap: 0.75rem !important; 
-                height: 100%;
-            }
-            
+            /* FORCE GRID LAYOUT */
+            .print-grid { display: grid !important; grid-template-columns: repeat(12, minmax(0, 1fr)) !important; gap: 0.5rem !important; }
             .print-col-12 { grid-column: span 12 / span 12 !important; }
             .print-col-4 { grid-column: span 4 / span 4 !important; }
             .print-col-8 { grid-column: span 8 / span 8 !important; }
             .print-flex-row { flex-direction: row !important; }
+            
+            /* Compact padding for print to save vertical space */
+            .print-compact-p { padding: 1rem !important; } 
         }
     </style>
 </head>
@@ -197,21 +185,18 @@
 
         const App = () => {
             return (
-                // Wrapper forces full height on print
                 <div className="min-h-screen w-full flex justify-center p-4 md:py-10 bg-dark font-sans selection:bg-accent selection:text-white">
                     
                     <button onClick={() => window.print()} className="print-hidden fixed bottom-8 right-8 z-50 bg-gradient-to-r from-orange-500 to-pink-500 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center hover:scale-110 transition-transform">
                         <i className="fas fa-download text-xl"></i>
                     </button>
 
-                    {/* CV GRID */}
                     <div className="cv-wrapper w-full md:max-w-[210mm] flex flex-col md:grid md:grid-cols-12 gap-3 print-grid">
                         
                         {/* 1. HEADER */}
-                        <div className="col-span-12 print-col-12 bento-card p-6 flex flex-col md:flex-row items-center gap-8 relative overflow-hidden print-flex-row">
+                        <div className="col-span-12 print-col-12 bento-card p-6 print-compact-p flex flex-col md:flex-row items-center gap-8 relative overflow-hidden print-flex-row">
                             <div className="absolute top-0 right-0 w-64 h-64 bg-accent/10 blur-[80px] rounded-full pointer-events-none"></div>
                             
-                            {/* Avatar */}
                             <div className="w-40 h-40 relative shrink-0">
                                 <div className="absolute inset-0 bg-accent/20 blur-xl rounded-full"></div>
                                 <img 
@@ -243,7 +228,7 @@
 
                         {/* 2. LEFT COLUMN */}
                         <div className="col-span-12 md:col-span-4 print-col-4 flex flex-col gap-3">
-                            <div className="bento-card p-5">
+                            <div className="bento-card p-5 print-compact-p">
                                 <div className="flex items-center gap-2 mb-3">
                                     <i className="fas fa-user-astronaut text-accent"></i>
                                     <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">About Me</span>
@@ -253,8 +238,7 @@
                                 </p>
                             </div>
 
-                            {/* Skills - Grows to fill space */}
-                            <div className="bento-card p-5 fill-space flex flex-col">
+                            <div className="bento-card p-5 print-compact-p flex-grow">
                                 <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">Core Skills</h3>
                                 <div className="flex flex-wrap gap-2 mb-6">
                                     {cvData.skills.map((skill, i) => (
@@ -264,7 +248,7 @@
                                     ))}
                                 </div>
                                 
-                                <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3 mt-auto">Tools</h3>
+                                <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">Tools</h3>
                                 <div className="grid grid-cols-1 gap-2">
                                     {cvData.tools.map((t, i) => (
                                         <div key={i} className="flex items-center gap-2 text-xs text-gray-400 bg-black/20 p-2 rounded">
@@ -277,7 +261,7 @@
 
                         {/* 3. RIGHT COLUMN */}
                         <div className="col-span-12 md:col-span-8 print-col-8 flex flex-col gap-3">
-                            <div className="bento-card p-6">
+                            <div className="bento-card p-6 print-compact-p">
                                 <h2 className="text-lg font-roleFont font-bold text-white mb-6 flex items-center gap-2">
                                     <span className="w-8 h-8 rounded bg-accent/10 flex items-center justify-center text-accent text-sm">
                                         <i className="fas fa-briefcase"></i>
@@ -285,7 +269,7 @@
                                     Experience
                                 </h2>
 
-                                <div className="flex flex-col gap-6">
+                                <div className="flex flex-col gap-5">
                                     {cvData.experience.map((exp, i) => (
                                         <div key={i} className="relative pl-6 border-l border-white/10 group">
                                             <div className="absolute -left-[5px] top-1.5 w-2.5 h-2.5 rounded-full bg-border group-hover:bg-accent transition-colors shadow-[0_0_0_4px_#18181b]"></div>
@@ -293,7 +277,7 @@
                                                 <h3 className="text-white font-bold text-lg group-hover:text-accent transition-colors">{exp.role}</h3>
                                                 <span className="text-xs font-mono text-gray-500 bg-white/5 px-2 py-1 rounded">{exp.period}</span>
                                             </div>
-                                            <div className="text-accent text-sm font-medium mb-2">{exp.company}</div>
+                                            <div className="text-accent text-sm font-medium mb-1">{exp.company}</div>
                                             <p className="text-gray-400 text-sm leading-relaxed">
                                                 {exp.desc}
                                             </p>
@@ -302,14 +286,13 @@
                                 </div>
                             </div>
 
-                            {/* Education - Grows to fill space */}
-                            <div className="bento-card p-6 fill-space flex flex-col justify-center">
+                            <div className="bento-card p-6 print-compact-p">
                                 <h2 className="text-lg font-roleFont font-bold text-white mb-4 flex items-center gap-2">
                                     <i className="fas fa-graduation-cap text-accent"></i> Education
                                 </h2>
-                                <div className="grid grid-cols-1 gap-4">
+                                <div className="grid grid-cols-1 gap-3">
                                     {cvData.education.map((edu, i) => (
-                                        <div key={i} className="bg-white/5 rounded-xl p-4 border border-white/5 hover:border-white/10 transition-colors flex justify-between items-center">
+                                        <div key={i} className="bg-white/5 rounded-xl p-3 border border-white/5 hover:border-white/10 transition-colors flex justify-between items-center">
                                             <div>
                                                 <div className="text-white font-bold text-sm">{edu.degree}</div>
                                                 <div className="text-gray-500 text-xs mt-1">{edu.school}</div>
