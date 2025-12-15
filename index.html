@@ -68,42 +68,39 @@
 
     <script>
         (function() {
-            // This function tries to load your image. 
-            // If it finds it, it makes a circle favicon. 
-            // If it FAILS, it creates an "AS" initial icon so it never looks broken.
             const setSmartFavicon = () => {
                 const link = document.createElement('link');
                 link.rel = 'icon';
                 document.head.appendChild(link);
 
                 const img = new Image();
-                img.src = './my-avatar.png'; // Looks for file in same folder
+                img.src = './my-avatar.png'; 
 
                 img.onload = () => {
-                    // Image found: Create circle version
+                    // UPDATED: Increased canvas size to 128x128 for sharper look
                     const canvas = document.createElement('canvas');
-                    canvas.width = 64; canvas.height = 64;
+                    canvas.width = 128; canvas.height = 128;
                     const ctx = canvas.getContext('2d');
                     ctx.beginPath();
-                    ctx.arc(32, 32, 32, 0, 2 * Math.PI);
+                    ctx.arc(64, 64, 64, 0, 2 * Math.PI); // Radius 64
                     ctx.closePath();
                     ctx.clip();
-                    ctx.drawImage(img, 0, 0, 64, 64);
+                    ctx.drawImage(img, 0, 0, 128, 128);
                     link.href = canvas.toDataURL();
                 };
 
                 img.onerror = () => {
-                    // Image NOT found: Create Initials version
+                    // Fallback Initials (Also scaled up)
                     const canvas = document.createElement('canvas');
-                    canvas.width = 64; canvas.height = 64;
+                    canvas.width = 128; canvas.height = 128;
                     const ctx = canvas.getContext('2d');
-                    ctx.fillStyle = '#f97316'; // Orange background
-                    ctx.beginPath(); ctx.arc(32, 32, 32, 0, 2 * Math.PI); ctx.fill();
+                    ctx.fillStyle = '#f97316'; 
+                    ctx.beginPath(); ctx.arc(64, 64, 64, 0, 2 * Math.PI); ctx.fill();
                     ctx.fillStyle = 'white';
-                    ctx.font = 'bold 28px sans-serif';
+                    ctx.font = 'bold 56px sans-serif'; // Larger font
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'middle';
-                    ctx.fillText('AS', 32, 34);
+                    ctx.fillText('AS', 64, 68);
                     link.href = canvas.toDataURL();
                 };
             };
@@ -122,7 +119,6 @@
                 location: "Surat, Gujarat",
             },
             
-            // Ensures code looks for the local file
             avatar: "./my-avatar.png",
             
             bio: "Motivated and tech-savvy Digital Marketing fresher with a strong background in Computer Applications (BCA). Passionate about blending technical skills with creative storytelling to drive engagement. Eager to launch a career in Social Media Management, applying modern strategies and AI tools to help brands grow. Ready to learn, adapt, and contribute to dynamic marketing campaigns.",
@@ -183,18 +179,17 @@
                     <div className="cv-wrapper w-full md:max-w-[210mm] flex flex-col md:grid md:grid-cols-12 gap-3 print-grid">
                         
                         {/* 1. HEADER */}
-                        <div className="col-span-12 print-col-12 bento-card p-6 flex flex-col md:flex-row items-center gap-6 relative overflow-hidden print-flex-row">
+                        <div className="col-span-12 print-col-12 bento-card p-6 flex flex-col md:flex-row items-center gap-8 relative overflow-hidden print-flex-row">
                             <div className="absolute top-0 right-0 w-64 h-64 bg-accent/10 blur-[80px] rounded-full pointer-events-none"></div>
                             
-                            <div className="w-28 h-28 relative shrink-0">
+                            {/* UPDATED: Increased Avatar Container Size (w-40 h-40 is approx 160px) */}
+                            <div className="w-40 h-40 relative shrink-0">
                                 <div className="absolute inset-0 bg-accent/20 blur-xl rounded-full"></div>
-                                {/* AVATAR IMG */}
                                 <img 
                                     src={cvData.avatar} 
                                     className="relative w-full h-full object-contain drop-shadow-2xl" 
                                     alt="Avatar" 
                                     onError={(e) => {
-                                        // Fallback if image fails to load inside the CV
                                         e.target.onerror = null; 
                                         e.target.src = "https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/People/Man%20Technologist%20Medium-Light%20Skin%20Tone.png"
                                     }}
