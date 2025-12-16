@@ -24,10 +24,10 @@
                         roleFont: ['Space Grotesk', 'sans-serif'],
                     },
                     colors: {
-                        dark: '#09090b',       
-                        card: '#18181b',       
-                        border: '#27272a',     
-                        accent: '#f97316',     // Orange
+                        dark: '#09090b',        
+                        card: '#18181b',        
+                        border: '#27272a',      
+                        accent: '#f97316',      // Orange
                     },
                     backgroundImage: {
                         'gradient-glow': 'linear-gradient(to right, #f97316, #db2777)', 
@@ -39,10 +39,12 @@
 
     <style>
         body { background-color: #09090b; color: #e4e4e7; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+        
         .bento-card { 
             background-color: #18181b; 
             border: 1px solid #27272a; 
-            border-radius: 16px; 
+            /* UPDATED: Increased border-radius for heavily rounded edges */
+            border-radius: 36px; 
             overflow: hidden; 
             position: relative;
             transition: border-color 0.3s ease;
@@ -211,7 +213,7 @@
                                 <div className="absolute inset-0 bg-accent/20 blur-xl rounded-full"></div>
                                 <img 
                                     src={cvData.avatar} 
-                                    className="relative w-full h-full object-contain drop-shadow-2xl" 
+                                    className="relative w-full h-full object-contain drop-shadow-2xl rounded-full" 
                                     alt="Avatar" 
                                     onError={(e) => { e.target.onerror = null; e.target.src = "https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/People/Man%20Technologist%20Medium-Light%20Skin%20Tone.png" }}
                                 />
@@ -223,13 +225,13 @@
                                     {cvData.role}
                                 </p>
                                 <div className="flex flex-wrap justify-center md:justify-start gap-4 text-xs text-gray-400 font-medium">
-                                    <span className="flex items-center gap-2 bg-white/5 px-3 py-1.5 rounded-full border border-white/5">
+                                    <span className="flex items-center gap-2 bg-white/5 px-4 py-2 rounded-full border border-white/5">
                                         <i className="fas fa-map-pin text-accent"></i> {cvData.contact.location}
                                     </span>
-                                    <a href={`mailto:${cvData.contact.email}`} className="flex items-center gap-2 bg-white/5 px-3 py-1.5 rounded-full border border-white/5 hover:bg-white/10 transition-colors">
+                                    <a href={`mailto:${cvData.contact.email}`} className="flex items-center gap-2 bg-white/5 px-4 py-2 rounded-full border border-white/5 hover:bg-white/10 transition-colors">
                                         <i className="fas fa-envelope text-accent"></i> {cvData.contact.email}
                                     </a>
-                                    <a href={`tel:${cvData.contact.phone}`} className="flex items-center gap-2 bg-white/5 px-3 py-1.5 rounded-full border border-white/5 hover:bg-white/10 transition-colors">
+                                    <a href={`tel:${cvData.contact.phone}`} className="flex items-center gap-2 bg-white/5 px-4 py-2 rounded-full border border-white/5 hover:bg-white/10 transition-colors">
                                         <i className="fas fa-phone text-accent"></i> {cvData.contact.phone}
                                     </a>
                                 </div>
@@ -238,7 +240,7 @@
 
                         {/* 2. LEFT COLUMN */}
                         <div className="col-span-12 md:col-span-4 print-col-4 flex flex-col gap-3">
-                            <div className="bento-card p-5">
+                            <div className="bento-card p-6">
                                 <div className="flex items-center gap-2 mb-3">
                                     <i className="fas fa-user-astronaut text-accent"></i>
                                     <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">About Me</span>
@@ -248,11 +250,12 @@
                                 </p>
                             </div>
 
-                            <div className="bento-card p-5 flex-grow">
+                            <div className="bento-card p-6 flex-grow">
                                 <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">Core Skills</h3>
                                 <div className="flex flex-wrap gap-2 mb-6">
                                     {cvData.skills.map((skill, i) => (
-                                        <span key={i} className="px-2.5 py-1 bg-white/5 text-gray-300 text-[11px] font-medium rounded border border-white/5 hover:border-accent/30 transition-colors">
+                                        /* UPDATED: rounded-full */
+                                        <span key={i} className="px-3 py-1.5 bg-white/5 text-gray-300 text-[11px] font-medium rounded-full border border-white/5 hover:border-accent/30 transition-colors">
                                             {skill}
                                         </span>
                                     ))}
@@ -261,7 +264,8 @@
                                 <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">Tools</h3>
                                 <div className="grid grid-cols-1 gap-2">
                                     {cvData.tools.map((t, i) => (
-                                        <div key={i} className="flex items-center gap-2 text-xs text-gray-400 bg-black/20 p-2 rounded">
+                                        /* UPDATED: rounded-3xl */
+                                        <div key={i} className="flex items-center gap-3 text-xs text-gray-400 bg-black/20 px-4 py-2.5 rounded-3xl">
                                             <i className={`${t.icon} text-accent`}></i> {t.name}
                                         </div>
                                     ))}
@@ -273,7 +277,7 @@
                         <div className="col-span-12 md:col-span-8 print-col-8 flex flex-col gap-3">
                             <div className="bento-card p-6">
                                 <h2 className="text-lg font-roleFont font-bold text-white mb-6 flex items-center gap-2">
-                                    <span className="w-8 h-8 rounded bg-accent/10 flex items-center justify-center text-accent text-sm">
+                                    <span className="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center text-accent text-sm">
                                         <i className="fas fa-briefcase"></i>
                                     </span>
                                     Experience
@@ -285,7 +289,8 @@
                                             <div className="absolute -left-[5px] top-1.5 w-2.5 h-2.5 rounded-full bg-border group-hover:bg-accent transition-colors shadow-[0_0_0_4px_#18181b]"></div>
                                             <div className="flex flex-col md:flex-row md:items-center justify-between mb-1">
                                                 <h3 className="text-white font-bold text-lg group-hover:text-accent transition-colors">{exp.role}</h3>
-                                                <span className="text-xs font-mono text-gray-500 bg-white/5 px-2 py-1 rounded">{exp.period}</span>
+                                                {/* UPDATED: rounded-full */}
+                                                <span className="text-xs font-mono text-gray-500 bg-white/5 px-3 py-1 rounded-full">{exp.period}</span>
                                             </div>
                                             <div className="text-accent text-sm font-medium mb-1">{exp.company}</div>
                                             <p className="text-gray-400 text-sm leading-relaxed">
@@ -302,12 +307,14 @@
                                 </h2>
                                 <div className="grid grid-cols-1 gap-3">
                                     {cvData.education.map((edu, i) => (
-                                        <div key={i} className="bg-white/5 rounded-xl p-3 border border-white/5 hover:border-white/10 transition-colors flex justify-between items-center">
+                                        /* UPDATED: rounded-3xl */
+                                        <div key={i} className="bg-white/5 rounded-3xl p-4 border border-white/5 hover:border-white/10 transition-colors flex justify-between items-center">
                                             <div>
                                                 <div className="text-white font-bold text-sm">{edu.degree}</div>
                                                 <div className="text-gray-500 text-xs mt-1">{edu.school}</div>
                                             </div>
-                                            <div className="text-accent font-mono text-xs bg-accent/10 px-2 py-1 rounded">{edu.year}</div>
+                                            {/* UPDATED: rounded-full */}
+                                            <div className="text-accent font-mono text-xs bg-accent/10 px-3 py-1 rounded-full">{edu.year}</div>
                                         </div>
                                     ))}
                                 </div>
