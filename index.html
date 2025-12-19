@@ -5,8 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Anaghan Smit | CV</title>
     
-    <script src="https://cdn.tailwindcss.com"></script>
+    <meta name="theme-color" content="#09090b">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Smit CV">
     
+    <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22Anaghan%20Smit%20CV%22,%22short_name%22:%22SmitCV%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%2309090b%22,%22theme_color%22:%22%23f97316%22,%22icons%22:[{%22src%22:%22https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/People/Man%20Technologist%20Medium-Light%20Skin%20Tone.png%22,%22sizes%22:%22512x512%22,%22type%22:%22image/png%22}]}">
+
+    <script src="https://cdn.tailwindcss.com"></script>
     <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -27,7 +33,7 @@
                         dark: '#09090b',        
                         card: '#18181b',        
                         border: '#27272a',      
-                        accent: '#f97316',      // Orange
+                        accent: '#f97316',
                     },
                     backgroundImage: {
                         'gradient-glow': 'linear-gradient(to right, #f97316, #db2777)', 
@@ -43,7 +49,6 @@
         .bento-card { 
             background-color: #18181b; 
             border: 1px solid #27272a; 
-            /* UPDATED: Increased border-radius for heavily rounded edges */
             border-radius: 36px; 
             overflow: hidden; 
             position: relative;
@@ -51,53 +56,18 @@
         }
         .bento-card:hover { border-color: #3f3f46; }
 
-        /* --- CENTERED PRINT SETTINGS --- */
+        /* --- PRINT SETTINGS --- */
         @media print {
-            @page { 
-                size: A4; 
-                margin: 0mm !important; 
-            }
-            
-            html, body {
-                width: 210mm;
-                height: 297mm;
-                margin: 0 !important;
-                padding: 0 !important;
-                background-color: #09090b !important;
-                overflow: hidden !important; 
-            }
-
-            #root {
-                display: flex;
-                /* THIS CENTERS IT VERTICALLY AND HORIZONTALLY */
-                justify-content: center;
-                align-items: center; 
-                width: 100%;
-                height: 100%;
-            }
-
-            .cv-wrapper {
-                width: 100% !important;
-                /* Slight scale down to ensure margins on all sides */
-                zoom: 90%; 
-                padding: 15mm !important;
-                box-sizing: border-box;
-            }
-
+            @page { size: A4; margin: 0mm !important; }
+            html, body { width: 210mm; height: 297mm; margin: 0 !important; padding: 0 !important; background-color: #09090b !important; overflow: hidden !important; }
+            #root { display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; }
+            .cv-wrapper { width: 100% !important; zoom: 90%; padding: 15mm !important; box-sizing: border-box; }
             .print-hidden { display: none !important; }
-            
-            .print-grid { 
-                display: grid !important; 
-                grid-template-columns: repeat(12, minmax(0, 1fr)) !important; 
-                gap: 0.75rem !important; 
-            }
-
+            .print-grid { display: grid !important; grid-template-columns: repeat(12, minmax(0, 1fr)) !important; gap: 0.75rem !important; }
             .print-col-12 { grid-column: span 12 / span 12 !important; }
             .print-col-4 { grid-column: span 4 / span 4 !important; }
             .print-col-8 { grid-column: span 8 / span 8 !important; }
             .print-flex-row { flex-direction: row !important; }
-            
-            /* Hide scrollbars */
             ::-webkit-scrollbar { display: none; }
         }
     </style>
@@ -107,36 +77,20 @@
     <div id="root"></div>
 
     <script>
-        (function() {
-            const setSmartFavicon = () => {
-                const link = document.createElement('link');
-                link.rel = 'icon';
-                document.head.appendChild(link);
-                const img = new Image();
-                img.src = './my-avatar.png'; 
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    canvas.width = 128; canvas.height = 128;
-                    const ctx = canvas.getContext('2d');
-                    ctx.beginPath(); ctx.arc(64, 64, 64, 0, 2 * Math.PI); ctx.closePath(); ctx.clip();
-                    ctx.drawImage(img, 0, 0, 128, 128);
-                    link.href = canvas.toDataURL();
-                };
-                img.onerror = () => {
-                    const canvas = document.createElement('canvas');
-                    canvas.width = 128; canvas.height = 128;
-                    const ctx = canvas.getContext('2d');
-                    ctx.fillStyle = '#f97316'; ctx.beginPath(); ctx.arc(64, 64, 64, 0, 2 * Math.PI); ctx.fill();
-                    ctx.fillStyle = 'white'; ctx.font = 'bold 56px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('AS', 64, 68);
-                    link.href = canvas.toDataURL();
-                };
-            };
-            setSmartFavicon();
-        })();
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                const swContent = `
+                    const CACHE_NAME = 'smit-cv-v3';
+                    self.addEventListener('install', (e) => e.waitUntil(caches.open(CACHE_NAME)));
+                    self.addEventListener('fetch', (e) => e.respondWith(caches.match(e.request).then(res => res || fetch(e.request))));
+                `;
+                const blob = new Blob([swContent], { type: 'application/javascript' });
+                navigator.serviceWorker.register(URL.createObjectURL(blob), { scope: './' });
+            });
+        }
     </script>
 
     <script type="text/babel">
-
         const cvData = {
             name: "Anaghan Smit Ashokbhai",
             role: "Digital Marketing & Social Media Manager",
@@ -145,27 +99,15 @@
                 phone: "+91 8866722633", 
                 location: "Surat, Gujarat",
             },
-            
             avatar: "./my-avatar.png",
-            
             bio: "Motivated and tech-savvy Digital Marketing fresher with a strong background in Computer Applications (BCA). Passionate about blending technical skills with creative storytelling to drive engagement. Eager to launch a career in Social Media Management, applying modern strategies and AI tools to help brands grow. Ready to learn, adapt, and contribute to dynamic marketing campaigns.",
-            
-            skills: [
-                "Social Media Strategy", 
-                "Content Creation", 
-                "SEO Basics", 
-                "Canva Design",
-                "Community Engagement", 
-                "Basic Web Dev (HTML/JS)"
-            ],
-            
+            skills: ["Social Media Strategy", "Content Creation", "SEO Basics", "Canva Design", "Community Engagement", "Basic Web Dev (HTML/JS)"],
             tools: [
                 { icon: "fa-brands fa-instagram", name: "Instagram/Reels" },
                 { icon: "fa-solid fa-paintbrush", name: "Canva / CapCut" },
                 { icon: "fa-solid fa-robot", name: "AI Tools (ChatGPT)" },
                 { icon: "fa-brands fa-google", name: "Google Analytics" },
             ],
-
             experience: [
                 {
                     role: "Social Media Manager",
@@ -180,27 +122,31 @@
                     desc: "Assisted in developing digital marketing campaigns and conducting keyword research for SEO. Analyzed market trends to identify new opportunities for brand promotion. Collaborated on content calendars and learned to utilize data analytics for decision making."
                 }
             ],
-
             education: [
-                { 
-                    degree: "Digital Marketing", 
-                    school: "Rejoice Talent Academy", 
-                    year: "2026"
-                },
-                { 
-                    degree: "Bachelor of Computer Application (BCA)", 
-                    school: "VNSGU (Veer Narmad South Gujarat University)", 
-                    year: "2025"
-                }
+                { degree: "Digital Marketing", school: "Rejoice Talent Academy", year: "2026" },
+                { degree: "Bachelor of Computer Application (BCA)", school: "VNSGU (Veer Narmad South Gujarat University)", year: "2025" }
             ]
         };
 
         const App = () => {
+            const handleDownload = () => {
+                const originalTitle = document.title;
+                document.title = "Anaghan_Smit_CV"; // Sets the PDF filename
+                setTimeout(() => {
+                    window.print();
+                    document.title = originalTitle;
+                }, 150);
+            };
+
             return (
                 <div className="min-h-screen w-full flex justify-center p-4 md:py-10 bg-dark font-sans selection:bg-accent selection:text-white">
                     
-                    <button onClick={() => window.print()} className="print-hidden fixed bottom-8 right-8 z-50 bg-gradient-to-r from-orange-500 to-pink-500 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center hover:scale-110 transition-transform">
-                        <i className="fas fa-download text-xl"></i>
+                    {/* ENHANCED DOWNLOAD BUTTON */}
+                    <button 
+                        onClick={handleDownload}
+                        className="print-hidden fixed bottom-8 right-8 z-50 bg-gradient-to-r from-orange-500 to-pink-500 text-white w-16 h-16 rounded-full shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all group"
+                    >
+                        <i className="fas fa-file-pdf text-2xl"></i>
                     </button>
 
                     <div className="cv-wrapper w-full md:max-w-[210mm] flex flex-col md:grid md:grid-cols-12 gap-3 print-grid">
@@ -254,7 +200,6 @@
                                 <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">Core Skills</h3>
                                 <div className="flex flex-wrap gap-2 mb-6">
                                     {cvData.skills.map((skill, i) => (
-                                        /* UPDATED: rounded-full */
                                         <span key={i} className="px-3 py-1.5 bg-white/5 text-gray-300 text-[11px] font-medium rounded-full border border-white/5 hover:border-accent/30 transition-colors">
                                             {skill}
                                         </span>
@@ -264,7 +209,6 @@
                                 <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">Tools</h3>
                                 <div className="grid grid-cols-1 gap-2">
                                     {cvData.tools.map((t, i) => (
-                                        /* UPDATED: rounded-3xl */
                                         <div key={i} className="flex items-center gap-3 text-xs text-gray-400 bg-black/20 px-4 py-2.5 rounded-3xl">
                                             <i className={`${t.icon} text-accent`}></i> {t.name}
                                         </div>
@@ -289,7 +233,6 @@
                                             <div className="absolute -left-[5px] top-1.5 w-2.5 h-2.5 rounded-full bg-border group-hover:bg-accent transition-colors shadow-[0_0_0_4px_#18181b]"></div>
                                             <div className="flex flex-col md:flex-row md:items-center justify-between mb-1">
                                                 <h3 className="text-white font-bold text-lg group-hover:text-accent transition-colors">{exp.role}</h3>
-                                                {/* UPDATED: rounded-full */}
                                                 <span className="text-xs font-mono text-gray-500 bg-white/5 px-3 py-1 rounded-full">{exp.period}</span>
                                             </div>
                                             <div className="text-accent text-sm font-medium mb-1">{exp.company}</div>
@@ -307,13 +250,11 @@
                                 </h2>
                                 <div className="grid grid-cols-1 gap-3">
                                     {cvData.education.map((edu, i) => (
-                                        /* UPDATED: rounded-3xl */
                                         <div key={i} className="bg-white/5 rounded-3xl p-4 border border-white/5 hover:border-white/10 transition-colors flex justify-between items-center">
                                             <div>
                                                 <div className="text-white font-bold text-sm">{edu.degree}</div>
                                                 <div className="text-gray-500 text-xs mt-1">{edu.school}</div>
                                             </div>
-                                            {/* UPDATED: rounded-full */}
                                             <div className="text-accent font-mono text-xs bg-accent/10 px-3 py-1 rounded-full">{edu.year}</div>
                                         </div>
                                     ))}
@@ -328,7 +269,6 @@
 
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<App />);
-
     </script>
 </body>
 </html>
