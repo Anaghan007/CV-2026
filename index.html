@@ -10,7 +10,10 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Smit CV">
     
-    <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22Anaghan%20Smit%20CV%22,%22short_name%22:%22SmitCV%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%2309090b%22,%22theme_color%22:%22%23f97316%22,%22icons%22:[{%22src%22:%22https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/People/Man%20Technologist%20Medium-Light%20Skin%20Tone.png%22,%22sizes%22:%22512x512%22,%22type%22:%22image/png%22}]}">
+    <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/People/Man%20Technologist%20Medium-Light%20Skin%20Tone.png">
+    <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/People/Man%20Technologist%20Medium-Light%20Skin%20Tone.png">
+
+    <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22Anaghan%20Smit%20CV%22,%22short_name%22:%22SmitCV%22,%22start_url%22:%22/index.html%22,%22display%22:%22standalone%22,%22background_color%22:%22%2309090b%22,%22theme_color%22:%22%23f97316%22,%22icons%22:[{%22src%22:%22https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/People/Man%20Technologist%20Medium-Light%20Skin%20Tone.png%22,%22sizes%22:%22512x512%22,%22type%22:%22image/png%22,%22purpose%22:%22any%20maskable%22}]}">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
@@ -75,16 +78,20 @@
     <div id="root"></div>
 
     <script>
-        // Service Worker Registration for PWA Support
+        // Service Worker is MANDATORY for the "Install" suggestion to appear
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 const swContent = `
-                    const CACHE_NAME = 'smit-cv-v4';
-                    self.addEventListener('install', (e) => e.waitUntil(caches.open(CACHE_NAME)));
-                    self.addEventListener('fetch', (e) => e.respondWith(caches.match(e.request).then(res => res || fetch(e.request))));
+                    const CACHE_NAME = 'smit-cv-v5';
+                    self.addEventListener('install', (event) => {
+                        event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(['/'])));
+                    });
+                    self.addEventListener('fetch', (event) => {
+                        event.respondWith(caches.match(event.request).then((response) => response || fetch(event.request)));
+                    });
                 `;
                 const blob = new Blob([swContent], { type: 'application/javascript' });
-                navigator.serviceWorker.register(URL.createObjectURL(blob), { scope: './' });
+                navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(err => console.log("SW failed", err));
             });
         }
     </script>
@@ -98,7 +105,7 @@
                 phone: "+91 8866722633", 
                 location: "Surat, Gujarat",
             },
-            avatar: "./my-avatar.png",
+            avatar: "./my-avatar.png", // Ensure this exists in your folder!
             bio: "Motivated and tech-savvy Digital Marketing fresher with a strong background in Computer Applications (BCA). Passionate about blending technical skills with creative storytelling to drive engagement. Eager to launch a career in Social Media Management, applying modern strategies and AI tools to help brands grow. Ready to learn, adapt, and contribute to dynamic marketing campaigns.",
             skills: ["Social Media Strategy", "Content Creation", "SEO Basics", "Canva Design", "Community Engagement", "Basic Web Dev (HTML/JS)"],
             tools: [
@@ -132,16 +139,15 @@
             const [isInstallable, setIsInstallable] = React.useState(false);
 
             React.useEffect(() => {
-                // Listen for the PWA install prompt event
                 window.addEventListener('beforeinstallprompt', (e) => {
                     e.preventDefault();
                     setDeferredPrompt(e);
-                    setIsInstallable(true);
+                    setIsInstallable(true); // Shows custom button
                 });
 
                 window.addEventListener('appinstalled', () => {
                     setIsInstallable(false);
-                    console.log('CV App Installed Successfully');
+                    setDeferredPrompt(null);
                 });
             }, []);
 
@@ -149,9 +155,7 @@
                 if (!deferredPrompt) return;
                 deferredPrompt.prompt();
                 const { outcome } = await deferredPrompt.userChoice;
-                if (outcome === 'accepted') {
-                    setIsInstallable(false);
-                }
+                if (outcome === 'accepted') setIsInstallable(false);
                 setDeferredPrompt(null);
             };
 
@@ -167,23 +171,20 @@
             return (
                 <div className="min-h-screen w-full flex justify-center p-4 md:py-10 bg-dark font-sans selection:bg-accent selection:text-white">
                     
-                    {/* FLOATING ACTIONS */}
+                    {/* FLOATING ACTION BUTTONS */}
                     <div className="print-hidden fixed bottom-8 right-8 z-50 flex flex-col gap-4 items-center">
-                        {/* INSTALL APP BUTTON (Visible only when installable) */}
                         {isInstallable && (
                             <button 
                                 onClick={handleInstall}
                                 className="bg-white text-dark w-14 h-14 rounded-full shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all animate-bounce"
-                                title="Install CV App"
+                                title="Install App"
                             >
-                                <i className="fas fa-mobile-screen-button text-xl"></i>
+                                <i className="fas fa-plus text-xl"></i>
                             </button>
                         )}
-
-                        {/* PDF BUTTON */}
                         <button 
                             onClick={handleDownload}
-                            className="bg-gradient-to-r from-orange-500 to-pink-500 text-white w-16 h-16 rounded-full shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all group"
+                            className="bg-gradient-to-r from-orange-500 to-pink-500 text-white w-16 h-16 rounded-full shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all"
                             title="Download PDF"
                         >
                             <i className="fas fa-file-pdf text-2xl"></i>
@@ -192,7 +193,7 @@
 
                     <div className="cv-wrapper w-full md:max-w-[210mm] flex flex-col md:grid md:grid-cols-12 gap-3 print-grid">
                         
-                        {/* HEADER */}
+                        {/* 1. HEADER */}
                         <div className="col-span-12 print-col-12 bento-card p-6 flex flex-col md:flex-row items-center gap-8 relative overflow-hidden print-flex-row">
                             <div className="absolute top-0 right-0 w-64 h-64 bg-accent/10 blur-[80px] rounded-full pointer-events-none"></div>
                             
@@ -215,10 +216,10 @@
                                     <span className="flex items-center gap-2 bg-white/5 px-4 py-2 rounded-full border border-white/5">
                                         <i className="fas fa-map-pin text-accent"></i> {cvData.contact.location}
                                     </span>
-                                    <a href={`mailto:${cvData.contact.email}`} className="flex items-center gap-2 bg-white/5 px-4 py-2 rounded-full border border-white/5 hover:bg-white/10 transition-colors">
+                                    <a href={`mailto:${cvData.contact.email}`} className="flex items-center gap-2 bg-white/5 px-4 py-2 rounded-full border border-white/5">
                                         <i className="fas fa-envelope text-accent"></i> {cvData.contact.email}
                                     </a>
-                                    <a href={`tel:${cvData.contact.phone}`} className="flex items-center gap-2 bg-white/5 px-4 py-2 rounded-full border border-white/5 hover:bg-white/10 transition-colors">
+                                    <a href={`tel:${cvData.contact.phone}`} className="flex items-center gap-2 bg-white/5 px-4 py-2 rounded-full border border-white/5">
                                         <i className="fas fa-phone text-accent"></i> {cvData.contact.phone}
                                     </a>
                                 </div>
@@ -232,16 +233,14 @@
                                     <i className="fas fa-user-astronaut text-accent"></i>
                                     <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">About Me</span>
                                 </div>
-                                <p className="text-gray-300 text-sm leading-relaxed font-light">
-                                    {cvData.bio}
-                                </p>
+                                <p className="text-gray-300 text-sm leading-relaxed font-light">{cvData.bio}</p>
                             </div>
 
                             <div className="bento-card p-6 flex-grow">
                                 <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">Core Skills</h3>
                                 <div className="flex flex-wrap gap-2 mb-6">
                                     {cvData.skills.map((skill, i) => (
-                                        <span key={i} className="px-3 py-1.5 bg-white/5 text-gray-300 text-[11px] font-medium rounded-full border border-white/5 hover:border-accent/30 transition-colors">
+                                        <span key={i} className="px-3 py-1.5 bg-white/5 text-gray-300 text-[11px] font-medium rounded-full border border-white/5">
                                             {skill}
                                         </span>
                                     ))}
@@ -267,19 +266,16 @@
                                     </span>
                                     Experience
                                 </h2>
-
                                 <div className="flex flex-col gap-5">
                                     {cvData.experience.map((exp, i) => (
                                         <div key={i} className="relative pl-6 border-l border-white/10 group">
-                                            <div className="absolute -left-[5px] top-1.5 w-2.5 h-2.5 rounded-full bg-border group-hover:bg-accent transition-colors shadow-[0_0_0_4px_#18181b]"></div>
+                                            <div className="absolute -left-[5px] top-1.5 w-2.5 h-2.5 rounded-full bg-border group-hover:bg-accent transition-all shadow-[0_0_0_4px_#18181b]"></div>
                                             <div className="flex flex-col md:flex-row md:items-center justify-between mb-1">
                                                 <h3 className="text-white font-bold text-lg group-hover:text-accent transition-colors">{exp.role}</h3>
                                                 <span className="text-xs font-mono text-gray-500 bg-white/5 px-3 py-1 rounded-full">{exp.period}</span>
                                             </div>
                                             <div className="text-accent text-sm font-medium mb-1">{exp.company}</div>
-                                            <p className="text-gray-400 text-sm leading-relaxed">
-                                                {exp.desc}
-                                            </p>
+                                            <p className="text-gray-400 text-sm leading-relaxed">{exp.desc}</p>
                                         </div>
                                     ))}
                                 </div>
@@ -291,7 +287,7 @@
                                 </h2>
                                 <div className="grid grid-cols-1 gap-3">
                                     {cvData.education.map((edu, i) => (
-                                        <div key={i} className="bg-white/5 rounded-3xl p-4 border border-white/5 hover:border-white/10 transition-colors flex justify-between items-center">
+                                        <div key={i} className="bg-white/5 rounded-3xl p-4 border border-white/5 flex justify-between items-center">
                                             <div>
                                                 <div className="text-white font-bold text-sm">{edu.degree}</div>
                                                 <div className="text-gray-500 text-xs mt-1">{edu.school}</div>
