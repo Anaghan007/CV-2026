@@ -56,7 +56,6 @@
         }
         .bento-card:hover { border-color: #3f3f46; }
 
-        /* --- PRINT SETTINGS --- */
         @media print {
             @page { size: A4; margin: 0mm !important; }
             html, body { width: 210mm; height: 297mm; margin: 0 !important; padding: 0 !important; background-color: #09090b !important; overflow: hidden !important; }
@@ -68,7 +67,6 @@
             .print-col-4 { grid-column: span 4 / span 4 !important; }
             .print-col-8 { grid-column: span 8 / span 8 !important; }
             .print-flex-row { flex-direction: row !important; }
-            ::-webkit-scrollbar { display: none; }
         }
     </style>
 </head>
@@ -77,10 +75,11 @@
     <div id="root"></div>
 
     <script>
+        // Service Worker Registration for PWA Support
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 const swContent = `
-                    const CACHE_NAME = 'smit-cv-v3';
+                    const CACHE_NAME = 'smit-cv-v4';
                     self.addEventListener('install', (e) => e.waitUntil(caches.open(CACHE_NAME)));
                     self.addEventListener('fetch', (e) => e.respondWith(caches.match(e.request).then(res => res || fetch(e.request))));
                 `;
@@ -129,9 +128,36 @@
         };
 
         const App = () => {
+            const [deferredPrompt, setDeferredPrompt] = React.useState(null);
+            const [isInstallable, setIsInstallable] = React.useState(false);
+
+            React.useEffect(() => {
+                // Listen for the PWA install prompt event
+                window.addEventListener('beforeinstallprompt', (e) => {
+                    e.preventDefault();
+                    setDeferredPrompt(e);
+                    setIsInstallable(true);
+                });
+
+                window.addEventListener('appinstalled', () => {
+                    setIsInstallable(false);
+                    console.log('CV App Installed Successfully');
+                });
+            }, []);
+
+            const handleInstall = async () => {
+                if (!deferredPrompt) return;
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    setIsInstallable(false);
+                }
+                setDeferredPrompt(null);
+            };
+
             const handleDownload = () => {
                 const originalTitle = document.title;
-                document.title = "Anaghan_Smit_CV"; // Sets the PDF filename
+                document.title = "Anaghan_Smit_CV"; 
                 setTimeout(() => {
                     window.print();
                     document.title = originalTitle;
@@ -141,17 +167,32 @@
             return (
                 <div className="min-h-screen w-full flex justify-center p-4 md:py-10 bg-dark font-sans selection:bg-accent selection:text-white">
                     
-                    {/* ENHANCED DOWNLOAD BUTTON */}
-                    <button 
-                        onClick={handleDownload}
-                        className="print-hidden fixed bottom-8 right-8 z-50 bg-gradient-to-r from-orange-500 to-pink-500 text-white w-16 h-16 rounded-full shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all group"
-                    >
-                        <i className="fas fa-file-pdf text-2xl"></i>
-                    </button>
+                    {/* FLOATING ACTIONS */}
+                    <div className="print-hidden fixed bottom-8 right-8 z-50 flex flex-col gap-4 items-center">
+                        {/* INSTALL APP BUTTON (Visible only when installable) */}
+                        {isInstallable && (
+                            <button 
+                                onClick={handleInstall}
+                                className="bg-white text-dark w-14 h-14 rounded-full shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all animate-bounce"
+                                title="Install CV App"
+                            >
+                                <i className="fas fa-mobile-screen-button text-xl"></i>
+                            </button>
+                        )}
+
+                        {/* PDF BUTTON */}
+                        <button 
+                            onClick={handleDownload}
+                            className="bg-gradient-to-r from-orange-500 to-pink-500 text-white w-16 h-16 rounded-full shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all group"
+                            title="Download PDF"
+                        >
+                            <i className="fas fa-file-pdf text-2xl"></i>
+                        </button>
+                    </div>
 
                     <div className="cv-wrapper w-full md:max-w-[210mm] flex flex-col md:grid md:grid-cols-12 gap-3 print-grid">
                         
-                        {/* 1. HEADER */}
+                        {/* HEADER */}
                         <div className="col-span-12 print-col-12 bento-card p-6 flex flex-col md:flex-row items-center gap-8 relative overflow-hidden print-flex-row">
                             <div className="absolute top-0 right-0 w-64 h-64 bg-accent/10 blur-[80px] rounded-full pointer-events-none"></div>
                             
@@ -184,7 +225,7 @@
                             </div>
                         </div>
 
-                        {/* 2. LEFT COLUMN */}
+                        {/* LEFT COLUMN */}
                         <div className="col-span-12 md:col-span-4 print-col-4 flex flex-col gap-3">
                             <div className="bento-card p-6">
                                 <div className="flex items-center gap-2 mb-3">
@@ -217,7 +258,7 @@
                             </div>
                         </div>
 
-                        {/* 3. RIGHT COLUMN */}
+                        {/* RIGHT COLUMN */}
                         <div className="col-span-12 md:col-span-8 print-col-8 flex flex-col gap-3">
                             <div className="bento-card p-6">
                                 <h2 className="text-lg font-roleFont font-bold text-white mb-6 flex items-center gap-2">
